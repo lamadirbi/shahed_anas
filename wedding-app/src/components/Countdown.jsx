@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './Countdown.css';
 
-const TARGET = new Date('2026-08-15T18:00:00+03:00');
+const TARGET = new Date('2026-08-23T18:00:00+03:00');
 
 function pad(n) {
   return String(n).padStart(2, '0');

@@ -6,8 +6,8 @@ const DETAILS = [
   {
     id: 'date',
     label: 'التاريخ',
-    value: 'يوم السبت الموافق',
-    highlight: '15 / 8',
+    value: 'يوم الأحد الموافق',
+    highlight: '23 / 8',
     icon: '✦',
   },
   {
