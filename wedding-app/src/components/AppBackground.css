@@ -1,0 +1,53 @@
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  min-height: 100svh;
+  background-color: #1a0a0e;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(20, 6, 10, 0.28) 0%,
+      rgba(20, 6, 10, 0.08) 38%,
+      rgba(20, 6, 10, 0.32) 100%
+    ),
+    url('/images/couple-outdoor.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center 32%;
+  pointer-events: none;
+  -webkit-background-size: cover;
+}
+
+/* جوالان — عمودي */
+@media (max-width: 480px) {
+  .app-bg {
+    background-position: center 28%;
+    background-size: cover;
+  }
+}
+
+/* جوال صغير */
+@media (max-width: 380px) {
+  .app-bg {
+    background-position: center 24%;
+  }
+}
+
+/* جوالان أفقي */
+@media (orientation: landscape) and (max-height: 520px) {
+  .app-bg {
+    background-position: center 40%;
+    background-size: cover;
+  }
+}
+
+/* شاشات عالية */
+@media (min-width: 768px) {
+  .app-bg {
+    background-position: center 35%;
+  }
+}

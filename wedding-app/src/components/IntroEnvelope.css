@@ -1,0 +1,327 @@
+/* ── شاشة فتح الدعوة — ظرف مطوي + ختم شمع ── */
+
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  overflow: hidden;
+  pointer-events: auto;
+  background: transparent;
+}
+
+/* نسخة الخلفية داخل شاشة الظرف — تضمن ظهورها على الجوال */
+.intro-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: #1a0a0e;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(20, 6, 10, 0.22) 0%,
+      rgba(20, 6, 10, 0.05) 42%,
+      rgba(20, 6, 10, 0.28) 100%
+    ),
+    url('/images/couple-outdoor.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center 28%;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .intro-screen::before {
+    background-position: center 24%;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .intro-screen::before {
+    background-position: center 38%;
+  }
+}
+
+/* الورقة — شفافة لإظهار الخلفية */
+.envelope-sheet {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  will-change: transform;
+  z-index: 1;
+}
+
+.envelope-sheet__texture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  background-image:
+    radial-gradient(ellipse at 25% 15%, rgba(184, 148, 63, 0.1), transparent 50%),
+    radial-gradient(ellipse at 75% 85%, rgba(92, 24, 40, 0.05), transparent 45%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 4px,
+      rgba(58, 15, 26, 0.018) 4px,
+      rgba(58, 15, 26, 0.018) 5px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 4px,
+      rgba(58, 15, 26, 0.018) 4px,
+      rgba(58, 15, 26, 0.018) 5px
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── طيات الظرف ── */
+.envelope-flap {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* جسم الظرف — شفاف جداً */
+.envelope-flap--body {
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 246, 240, 0.14) 0%,
+    rgba(235, 227, 214, 0.1) 55%,
+    rgba(219, 210, 196, 0.08) 100%
+  );
+  z-index: 2;
+}
+
+/* الطية اليسرى */
+.envelope-flap--left {
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(250, 246, 240, 0.22) 0%,
+    rgba(221, 212, 198, 0.16) 60%,
+    rgba(196, 185, 169, 0.12) 100%
+  );
+  clip-path: polygon(0 0, 50% 48%, 0 100%);
+  box-shadow: inset -2px 0 8px rgba(58, 15, 26, 0.06);
+  z-index: 3;
+}
+
+/* الطية اليمنى */
+.envelope-flap--right {
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    225deg,
+    rgba(250, 246, 240, 0.22) 0%,
+    rgba(221, 212, 198, 0.16) 60%,
+    rgba(196, 185, 169, 0.12) 100%
+  );
+  clip-path: polygon(100% 0, 50% 48%, 100% 100%);
+  box-shadow: inset 2px 0 8px rgba(58, 15, 26, 0.06);
+  z-index: 3;
+}
+
+/* الطية السفلية */
+.envelope-flap--bottom {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 52%;
+  background: linear-gradient(
+    0deg,
+    rgba(213, 203, 192, 0.2) 0%,
+    rgba(205, 195, 182, 0.12) 40%,
+    transparent 100%
+  );
+  clip-path: polygon(0 100%, 50% 8%, 100% 100%);
+  box-shadow: inset 0 2px 8px rgba(58, 15, 26, 0.05);
+  z-index: 4;
+}
+
+/* الغطاء العلوي — المطوي للأسفل */
+.envelope-flap--top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 54%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 253, 249, 0.28) 0%,
+    rgba(245, 239, 230, 0.18) 70%,
+    rgba(224, 214, 202, 0.1) 100%
+  );
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  box-shadow:
+    0 4px 14px rgba(58, 15, 26, 0.08),
+    inset 0 -1px 4px rgba(58, 15, 26, 0.05);
+  z-index: 6;
+}
+
+/* خطوط الطي */
+.envelope-crease {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.envelope-crease--left {
+  top: 0;
+  left: 0;
+  width: 51%;
+  height: 51%;
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+  border-bottom: 1px solid rgba(140, 120, 95, 0.15);
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+  transform-origin: top left;
+}
+
+.envelope-crease--right {
+  top: 0;
+  right: 0;
+  width: 51%;
+  height: 51%;
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+  border-bottom: 1px solid rgba(140, 120, 95, 0.15);
+  clip-path: polygon(100% 0, 0 100%, 100% 100%);
+  transform-origin: top right;
+}
+
+.envelope-crease--bottom {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  clip-path: polygon(0 100%, 50% 0, 100% 100%);
+}
+
+/* ── الختم — ثابت بالمنتصف تماماً ── */
+.envelope-seal-anchor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.envelope-seal {
+  display: block;
+  position: relative;
+  width: 112px;
+  height: 112px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  transform-origin: center center;
+}
+
+/* شمع بحدود غير منتظمة */
+.envelope-seal__wax {
+  position: absolute;
+  inset: 4px;
+  border-radius: 48% 52% 50% 50% / 50% 48% 52% 50%;
+  background:
+    radial-gradient(ellipse at 30% 25%, rgba(210, 80, 100, 0.5), transparent 45%),
+    radial-gradient(ellipse at 70% 75%, rgba(40, 8, 16, 0.4), transparent 40%),
+    radial-gradient(circle at 50% 50%, #7a2435 0%, #5c1828 45%, #3a0f1a 85%);
+  box-shadow:
+    0 14px 40px rgba(58, 15, 26, 0.42),
+    0 4px 12px rgba(58, 15, 26, 0.25),
+    0 0 0 6px rgba(184, 148, 63, 0.1),
+    inset 0 3px 10px rgba(255, 220, 200, 0.18),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* المحتوى الداخلي للختم */
+.envelope-seal__inner {
+  position: absolute;
+  inset: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.envelope-seal__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(212, 176, 106, 0.5);
+  box-shadow:
+    inset 0 0 8px rgba(212, 176, 106, 0.15),
+    0 0 0 1px rgba(212, 176, 106, 0.2);
+}
+
+.envelope-seal__monogram {
+  position: relative;
+  font-size: 1.65rem;
+  line-height: 1;
+  color: var(--gold-shimmer);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25),
+    0 -1px 2px rgba(0, 0, 0, 0.45),
+    0 0 12px rgba(212, 176, 106, 0.4);
+  letter-spacing: -0.02em;
+}
+
+.envelope-seal__dot {
+  display: inline-block;
+  margin: 0 1px;
+  font-size: 0.9rem;
+  color: var(--gold);
+  opacity: 0.85;
+}
+
+.envelope-seal__label {
+  position: relative;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: rgba(232, 204, 130, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.intro-hint {
+  position: fixed;
+  bottom: max(44px, env(safe-area-inset-bottom, 44px));
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--text-sm);
+  color: #fff8f0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+  z-index: 301;
+  white-space: nowrap;
+  animation: hint-pulse 2.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}
+
+@media (min-width: 480px) {
+  .envelope-seal {
+    width: 128px;
+    height: 128px;
+  }
+
+  .envelope-seal__monogram {
+    font-size: 1.85rem;
+  }
+
+  .envelope-seal__label {
+    font-size: 0.68rem;
+  }
+}

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>دعوة زفاف أنس وشهد</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --burgundy: #6d1f2e;
+      --burgundy-dark: #4a1420;
+      --burgundy-light: #8b2d3f;
+      --beige: #f3e8d8;
+      --beige-dark: #d9c9b0;
+      --gold: #c9a45c;
+      --cream: #faf6f0;
+      --shadow: rgba(74, 20, 32, 0.55);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #1a1014;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .app {
+      position: relative;
+      width: min(100vw, 420px);
+      height: min(100vh, 820px);
+      aspect-ratio: 9 / 16;
+      background: var(--burgundy-dark);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.4s ease-in-out;
+      transform: scale(1.03);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+      transition: opacity 1.4s ease-in-out, transform 6s ease-out;
+    }
+
+    .slide-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.08);
+      animation: kenburns 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes kenburns {
+      from { transform: scale(1.05); }
+      to { transform: scale(1.18); }
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(74,20,32,0.72) 0%, rgba(74,20,32,0.25) 35%, rgba(74,20,32,0.35) 65%, rgba(74,20,32,0.82) 100%),
+        radial-gradient(circle at 50% 20%, rgba(243,232,216,0.12), transparent 55%);
+    }
+
+    .frame {
+      position: absolute;
+      inset: 18px;
+      border: 2px solid rgba(201,164,92,0.75);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .frame::before,
+    .frame::after {
+      content: '';
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      border: 2px solid var(--gold);
+    }
+
+    .frame::before { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+    .frame::after { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 42px 28px;
+      color: var(--cream);
+    }
+
+    .verse {
+      font-family: 'Amiri', serif;
+      font-size: clamp(1.35rem, 5vw, 1.75rem);
+      line-height: 1.9;
+      color: var(--beige);
+      text-shadow: 0 2px 12px var(--shadow);
+      margin-bottom: 14px;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 1.2s ease forwards 0.4s;
+    }
+
+    .verse-ref {
+      font-size: 0.95rem;
+      color: var(--gold);
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1s;
+    }
+
+    .hero-title {
+      font-family: 'Amiri', serif;
+      font-size: clamp(1.8rem, 7vw, 2.4rem);
+      font-weight: 700;
+      color: var(--beige);
+      text-shadow: 0 4px 18px var(--shadow);
+      margin-bottom: 8px;
+      opacity: 0;
+      transform: translateY(22px);
+      animation: fadeUp 1.1s ease forwards 0.5s;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--gold);
+      letter-spacing: 1px;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.1s;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 18px;
+      border: 1px solid rgba(201,164,92,0.8);
+      border-radius: 999px;
+      background: rgba(109,31,46,0.55);
+      color: var(--beige);
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      animation: fadeUp 0.9s ease forwards 0.3s;
+    }
+
+    .name {
+      font-family: 'Amiri', serif;
+      font-size: clamp(1.55rem, 6vw, 2rem);
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 8px;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.7s;
+    }
+
+    .parent {
+      font-size: 1rem;
+      color: var(--beige-dark);
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.2s;
+    }
+
+    .divider {
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 18px auto;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.9s;
+    }
+
+    .heart {
+      font-size: 2rem;
+      color: var(--gold);
+      margin: 8px 0;
+      opacity: 0;
+      animation: pulse 1.6s ease-in-out infinite 1s, fadeUp 0.8s ease forwards 0.5s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+
+    .details-box {
+      background: rgba(243,232,216,0.12);
+      border: 1px solid rgba(201,164,92,0.55);
+      border-radius: 16px;
+      padding: 22px 20px;
+      width: 100%;
+      max-width: 320px;
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.6s;
+    }
+
+    .details-box h3 {
+      font-family: 'Amiri', serif;
+      font-size: 1.5rem;
+      color: var(--beige);
+      margin-bottom: 16px;
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px 0;
+      font-size: 1.02rem;
+      color: var(--cream);
+      line-height: 1.6;
+    }
+
+    .detail-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(109,31,46,0.7);
+      border: 1px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .closing {
+      font-family: 'Amiri', serif;
+      font-size: clamp(1.5rem, 6vw, 2rem);
+      color: var(--beige);
+      line-height: 1.8;
+      text-shadow: 0 3px 16px var(--shadow);
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 0.5s;
+    }
+
+    .closing-sub {
+      margin-top: 14px;
+      font-size: 1rem;
+      color: var(--gold);
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.2s;
+    }
+
+    .sparkles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--gold);
+      border-radius: 50%;
+      opacity: 0;
+      animation: sparkle 3s ease-in-out infinite;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: 0.9; transform: scale(1.2); }
+    }
+
+    .start-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background:
+        linear-gradient(160deg, var(--burgundy-dark), var(--burgundy)),
+        url('../صور/WhatsApp Image 2026-07-12 at 10.57.11 AM.jpeg') center/cover;
+      background-blend-mode: overlay;
+      color: var(--cream);
+      text-align: center;
+      padding: 30px;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    .start-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .start-screen h1 {
+      font-family: 'Amiri', serif;
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: var(--beige);
+    }
+
+    .start-screen p {
+      font-size: 1rem;
+      color: var(--beige-dark);
+      margin-bottom: 28px;
+      line-height: 1.7;
+    }
+
+    .start-btn {
+      border: none;
+      cursor: pointer;
+      padding: 14px 36px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--gold), #e0c07a);
+      color: var(--burgundy-dark);
+      font-family: 'Cairo', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease;
+    }
+
+    .start-btn:hover { transform: scale(1.04); }
+
+    .progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255,255,255,0.15);
+      z-index: 40;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold), var(--beige));
+      transition: width 0.3s linear;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .slide:not(.active) .content * {
+      animation: none !important;
+      opacity: 0;
+    }
+
+    .slide.active .content * {
+      animation-play-state: running;
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="start-screen" id="startScreen">
+      <h1>دعوة زفاف</h1>
+      <p>أنس &amp; شهد<br />اضغطي لتشغيل الدعوة والأغنية</p>
+      <button class="start-btn" id="startBtn">▶ تشغيل الدعوة</button>
+    </div>
+
+    <!-- Slide 1: آية + صورة العريس -->
+    <section class="slide active" data-duration="6000">
+      <div class="slide-bg" style="background-image:url('../صور/WhatsApp Image 2026-07-12 at 10.57.11 AM.jpeg')"></div>
+      <div class="overlay"></div>
+      <div class="frame"></div>
+      <div class="sparkles" id="sparkles1"></div>
+      <div class="content">
+        <p class="verse">"وجعل بينكم مودة ورحمة"</p>
+        <p class="verse-ref">﴿ سورة الروم ﴾</p>
+        <div class="divider"></div>
+        <h2 class="hero-title">شيخ الشباب عريسنا</h2>
+        <p class="hero-sub">بداية قصة حب جميلة</p>
+      </div>
+    </section>
+
+    <!-- Slide 2: العريس -->
+    <section class="slide" data-duration="5500">
+      <div class="slide-bg" style="background-image:url('../صور/WhatsApp Image 2026-07-12 at 10.57.15 AM (1).jpeg')"></div>
+      <div class="overlay"></div>
+      <div class="frame"></div>
+      <div class="content">
+        <span class="badge">المحاسب</span>
+        <h2 class="name">أنس معين حنيف</h2>
+        <p class="parent">ابن السيد معين حمزة حنيف</p>
+        <div class="divider"></div>
+        <p class="hero-sub">بإذن الله تعالى</p>
+      </div>
+    </section>
+
+    <!-- Slide 3: العروس -->
+    <section class="slide" data-duration="5500">
+      <div class="slide-bg" style="background-image:url('../صور/WhatsApp Image 2026-07-12 at 10.57.15 AM.jpeg')"></div>
+      <div class="overlay"></div>
+      <div class="frame"></div>
+      <div class="content">
+        <span class="badge">المهندسة</span>
+        <h2 class="name">شهد محمد قشطة</h2>
+        <p class="parent">ابنة الحاج محمد صلاح قشطة</p>
+        <div class="divider"></div>
+        <p class="hero-sub">عروستنا الغالية</p>
+      </div>
+    </section>
+
+    <!-- Slide 4: صور العروسين -->
+    <section class="slide" data-duration="6000">
+      <div class="slide-bg" style="background-image:url('../صور/WhatsApp Image 2026-07-12 at 10.57.16 AM (3).jpeg')"></div>
+      <div class="overlay"></div>
+      <div class="frame"></div>
+      <div class="content">
+        <p class="verse">يسعدنا دعوتكم لمشاركتنا فرحتنا</p>
+        <div class="heart">♥</div>
+        <h2 class="name">أنس &amp; شهد</h2>
+        <p class="hero-sub">رحلة حب تكتمل بالزواج</p>
+      </div>
+    </section>
+
+    <!-- Slide 5: تفاصيل الحفل -->
+    <section class="slide" data-duration="8000">
+      <div class="slide-bg" style="background-image:url('../صور/WhatsApp Image 2026-07-12 at 10.57.14 AM.jpeg')"></div>
+      <div class="overlay"></div>
+      <div class="frame"></div>
+      <div class="content">
+        <div class="details-box">
+          <h3>تفاصيل الحفل</h3>
+          <div class="detail-row">
+            <span class="detail-icon">📅</span>
+            <span>يوم السبت الموافق 15 / 8</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-icon">🕕</span>
+            <span>الساعة 6:00 مساءً</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-icon">📍</span>
+            <span>دير البلح - البصة - شارع 24<br />لف ستوري</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6: ختام -->
+    <section class="slide" data-duration="6000">
+      <div class="slide-bg" style="background-image:url('../صور/WhatsApp Image 2026-07-12 at 10.57.16 AM (1).jpeg')"></div>
+      <div class="overlay"></div>
+      <div class="frame"></div>
+      <div class="content">
+        <p class="closing">حضوركم يزيد فرحتنا</p>
+        <p class="closing-sub">نتشرف بحضوركم ومشاركتكم أجمل لحظاتنا</p>
+        <div class="divider"></div>
+        <p class="hero-sub">مع تحيات آل حنيف وآل قشطة</p>
+      </div>
+    </section>
+
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+
+  <audio id="weddingAudio" preload="auto">
+    <source src="../صور/WhatsApp Audio 2026-07-12 at 5.35.28 PM.mp4" type="audio/mp4" />
+  </audio>
+
+  <script>
+    const AUDIO_START = 28;
+    const slides = [...document.querySelectorAll('.slide')];
+    const progressBar = document.getElementById('progressBar');
+    const startScreen = document.getElementById('startScreen');
+    const startBtn = document.getElementById('startBtn');
+    const audio = document.getElementById('weddingAudio');
+    let current = 0;
+    let timer = null;
+    let totalDuration = slides.reduce((s, el) => s + Number(el.dataset.duration), 0);
+    let elapsed = 0;
+
+    function createSparkles(container) {
+      for (let i = 0; i < 18; i++) {
+        const s = document.createElement('span');
+        s.className = 'sparkle';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.animationDelay = (Math.random() * 3) + 's';
+        container.appendChild(s);
+      }
+    }
+
+    document.querySelectorAll('.sparkles').forEach(createSparkles);
+
+    function showSlide(index) {
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+      current = index;
+    }
+
+    function updateProgress() {
+      progressBar.style.width = Math.min((elapsed / totalDuration) * 100, 100) + '%';
+    }
+
+    function nextSlide() {
+      elapsed += Number(slides[current].dataset.duration);
+      updateProgress();
+      const next = current + 1;
+      if (next >= slides.length) {
+        elapsed = 0;
+        updateProgress();
+        showSlide(0);
+        timer = setTimeout(nextSlide, Number(slides[0].dataset.duration));
+        return;
+      }
+      showSlide(next);
+      timer = setTimeout(nextSlide, Number(slides[next].dataset.duration));
+    }
+
+    function startShow() {
+      startScreen.classList.add('hidden');
+      showSlide(0);
+      elapsed = 0;
+      updateProgress();
+      audio.currentTime = AUDIO_START;
+      audio.play().catch(() => {});
+      clearTimeout(timer);
+      timer = setTimeout(nextSlide, Number(slides[0].dataset.duration));
+    }
+
+    startBtn.addEventListener('click', startShow);
+
+    audio.addEventListener('ended', () => {
+      audio.currentTime = AUDIO_START;
+      audio.play().catch(() => {});
+    });
+
+    document.getElementById('app').addEventListener('click', (e) => {
+      if (!startScreen.classList.contains('hidden') || e.target.closest('.start-btn')) return;
+      if (audio.paused) {
+        audio.currentTime = AUDIO_START;
+        audio.play().catch(() => {});
+      }
+    });
+  </script>
+</body>
+</html>
