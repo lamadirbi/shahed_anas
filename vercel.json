@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd wedding-app && npm install",
+  "buildCommand": "cd wedding-app && npm run build",
+  "outputDirectory": "wedding-app/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
