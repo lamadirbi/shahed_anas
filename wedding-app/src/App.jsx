@@ -33,7 +33,7 @@ export default function App() {
   const playAudio = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.currentTime = 28;
+    audio.currentTime = 0;
     audio.play().catch(() => {});
   }, []);
 

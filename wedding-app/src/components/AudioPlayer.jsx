@@ -9,7 +9,6 @@ const AudioPlayer = forwardRef(function AudioPlayer({ started }, ref) {
     const a = audioRef.current;
     if (!a) return;
     if (a.paused) {
-      if (!started) a.currentTime = 28;
       a.play().catch(() => {});
     } else {
       a.pause();
