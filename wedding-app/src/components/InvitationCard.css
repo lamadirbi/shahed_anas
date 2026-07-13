@@ -315,6 +315,7 @@
   justify-content: center;
   gap: 8px;
   min-width: 0;
+  overflow: hidden;
   padding: var(--space-md) var(--space-sm);
   background: linear-gradient(168deg, rgba(255, 253, 249, 0.98), rgba(245, 235, 220, 0.88));
   border: 1px solid rgba(184, 148, 63, 0.38);
@@ -349,15 +350,17 @@
 
 .couple-row__name {
   font-family: var(--font-body);
-  font-size: clamp(0.78rem, 3.2vw, 1.1rem);
+  font-size: clamp(0.68rem, 2.8vw, 1rem);
   font-weight: 700;
   color: var(--burgundy-dark);
-  line-height: 1.5;
+  line-height: 1.35;
   text-align: center;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
+  letter-spacing: 0;
+  white-space: normal;
   width: 100%;
-  padding-inline: var(--space-xs);
+  max-width: 100%;
+  margin: 0 auto;
+  padding-inline: 2px;
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
 }
@@ -465,6 +468,27 @@
   }
 }
 
+@media (max-width: 480px) {
+  .couple-row {
+    gap: 4px;
+  }
+
+  .couple-row__side {
+    padding: var(--space-sm) 4px;
+  }
+
+  .couple-row__heart {
+    width: 30px;
+    height: 30px;
+    font-size: 0.72rem;
+  }
+
+  .couple-row__name {
+    font-size: clamp(0.56rem, 2.35vw, 0.68rem);
+    line-height: 1.3;
+  }
+}
+
 @media (max-width: 360px) {
   .main-content {
     padding: var(--space-lg) var(--space-sm) var(--space-xl);
@@ -479,7 +503,7 @@
   }
 
   .couple-row__name {
-    font-size: clamp(0.72rem, 2.9vw, 0.95rem);
+    font-size: clamp(0.52rem, 2.2vw, 0.62rem);
   }
 
   .countdown-num {
