@@ -9,7 +9,7 @@ function PhotoFrame({ src, position = 'center 35%', className = '' }) {
         src={src}
         alt=""
         className="photo-img"
-        loading="lazy"
+        loading="eager"
         style={{ objectPosition: position }}
       />
     </div>

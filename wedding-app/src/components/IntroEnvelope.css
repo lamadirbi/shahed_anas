@@ -225,6 +225,11 @@
   transform-origin: center center;
 }
 
+.envelope-seal:disabled {
+  cursor: wait;
+  pointer-events: none;
+}
+
 /* شمع بحدود غير منتظمة */
 .envelope-seal__wax {
   position: absolute;

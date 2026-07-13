@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import './IntroEnvelope.css';
 
-export default function IntroEnvelope({ onLiftStart, onLiftEnd }) {
+export default function IntroEnvelope({ ready, onPlayAudio, onLiftStart, onLiftEnd }) {
   const [lifting, setLifting] = useState(false);
 
   const handleOpen = () => {
-    if (lifting) return;
+    if (lifting || !ready) return;
+    onPlayAudio?.();
     setLifting(true);
     onLiftStart();
     setTimeout(onLiftEnd, 1300);
@@ -45,12 +46,15 @@ export default function IntroEnvelope({ onLiftStart, onLiftEnd }) {
           <motion.button
             className="envelope-seal"
             onClick={handleOpen}
+            disabled={!ready}
             aria-label="افتحي دعوة أنس وشهد"
             type="button"
             animate={
               lifting
                 ? { opacity: 0, scale: 0.75 }
-                : { scale: [1, 1.045, 1] }
+                : ready
+                  ? { scale: [1, 1.045, 1] }
+                  : { opacity: 0.75, scale: 1 }
             }
             transition={
               lifting
@@ -78,7 +82,7 @@ export default function IntroEnvelope({ onLiftStart, onLiftEnd }) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          اضغطي على الختم لفتح الدعوة
+          {ready ? 'اضغطي على الختم لفتح الدعوة' : 'جاري تحميل الصور والموسيقى...'}
         </motion.p>
       )}
     </motion.div>
