@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   canDeleteWish,
   getStoredDeleteTokens,
@@ -9,26 +9,75 @@ import {
 import { scrollReveal, scrollTransition, scrollViewport } from './scrollAnimations';
 import './WishesSection.css';
 
+const PREVIEW_LENGTH = 90;
+
+function WishCard({ wish, owned, deleting, onDelete, onOpen }) {
+  const isLong = wish.message.length > PREVIEW_LENGTH;
+  const preview = isLong
+    ? `${wish.message.slice(0, PREVIEW_LENGTH).trim()}…`
+    : wish.message;
+
+  return (
+    <li className="wishes-list__card">
+      <div className="wishes-list__card-header">
+        <span className="wishes-list__name font-verse">{wish.name}</span>
+        {owned && (
+          <button
+            type="button"
+            className="wishes-list__delete font-body"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(wish.id);
+            }}
+            disabled={deleting}
+            aria-label="حذف التهنئة"
+          >
+            {deleting ? '...' : 'حذف'}
+          </button>
+        )}
+      </div>
+
+      <button
+        type="button"
+        className={`wishes-list__message font-verse${isLong ? ' wishes-list__message--truncatable' : ''}`}
+        onClick={() => onOpen(wish)}
+        aria-label={isLong ? 'عرض الرسالة كاملة' : undefined}
+      >
+        {preview}
+        {isLong && <span className="wishes-list__more">اضغط للقراءة</span>}
+      </button>
+    </li>
+  );
+}
+
 export default function WishesSection() {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [wishes, setWishes] = useState([]);
+  const [ownedIds, setOwnedIds] = useState(() => new Set());
   const [submitState, setSubmitState] = useState('idle');
   const [error, setError] = useState('');
   const [loadingWishes, setLoadingWishes] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [openedWish, setOpenedWish] = useState(null);
+
+  const refreshOwnedIds = useCallback(() => {
+    const tokens = getStoredDeleteTokens();
+    setOwnedIds(new Set(Object.keys(tokens)));
+  }, []);
 
   const fetchWishes = useCallback(async () => {
     try {
       const res = await fetch('/api/wishes');
       const data = await res.json();
       setWishes(data.wishes ?? []);
+      refreshOwnedIds();
     } catch {
       setError('تعذّر تحميل التهاني');
     } finally {
       setLoadingWishes(false);
     }
-  }, []);
+  }, [refreshOwnedIds]);
 
   useEffect(() => {
     fetchWishes();
@@ -56,6 +105,7 @@ export default function WishesSection() {
 
       if (data.wish && data.deleteToken) {
         storeDeleteToken(data.wish.id, data.deleteToken);
+        refreshOwnedIds();
         setWishes((prev) => [data.wish, ...prev]);
       }
 
@@ -70,6 +120,9 @@ export default function WishesSection() {
   }
 
   async function handleDelete(wishId) {
+    if (!canDeleteWish(wishId)) return;
+    if (!window.confirm('هل تريد حذف هذه التهنئة؟')) return;
+
     const tokens = getStoredDeleteTokens();
     const deleteToken = tokens[wishId];
     if (!deleteToken) return;
@@ -92,7 +145,9 @@ export default function WishesSection() {
       }
 
       removeStoredDeleteToken(wishId);
+      refreshOwnedIds();
       setWishes((prev) => prev.filter((wish) => wish.id !== wishId));
+      if (openedWish?.id === wishId) setOpenedWish(null);
     } catch {
       setError('تعذّر حذف التهنئة');
     } finally {
@@ -156,7 +211,7 @@ export default function WishesSection() {
 
         {submitState === 'success' && (
           <p className="wishes-form__success font-body">
-            تم إرسال تهنئتك بنجاح! شكراً لمشاركتكم الفرح
+            تم إرسال تهنئتك بنجاح! يمكنك حذفها من نفس الجهاز لاحقاً
           </p>
         )}
       </form>
@@ -171,27 +226,67 @@ export default function WishesSection() {
         ) : (
           <ul className="wishes-list__items">
             {wishes.map((wish) => (
-              <li key={wish.id} className="wishes-list__card">
-                <div className="wishes-list__card-header">
-                  <span className="wishes-list__name font-verse">{wish.name}</span>
-                  {canDeleteWish(wish.id) && (
-                    <button
-                      type="button"
-                      className="wishes-list__delete font-body"
-                      onClick={() => handleDelete(wish.id)}
-                      disabled={deletingId === wish.id}
-                      aria-label="حذف تهنئتي"
-                    >
-                      {deletingId === wish.id ? '...' : 'حذف'}
-                    </button>
-                  )}
-                </div>
-                <p className="wishes-list__message font-verse">{wish.message}</p>
-              </li>
+              <WishCard
+                key={wish.id}
+                wish={wish}
+                owned={ownedIds.has(wish.id)}
+                deleting={deletingId === wish.id}
+                onDelete={handleDelete}
+                onOpen={setOpenedWish}
+              />
             ))}
           </ul>
         )}
       </div>
+
+      <AnimatePresence>
+        {openedWish && (
+          <motion.div
+            className="wishes-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpenedWish(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label="رسالة التهنئة كاملة"
+          >
+            <motion.div
+              className="wishes-modal__panel"
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.96 }}
+              transition={{ duration: 0.25 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="wishes-modal__header">
+                <h4 className="wishes-modal__name font-verse">{openedWish.name}</h4>
+                <button
+                  type="button"
+                  className="wishes-modal__close font-body"
+                  onClick={() => setOpenedWish(null)}
+                  aria-label="إغلاق"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="wishes-modal__body">
+                <p className="wishes-modal__message font-verse">{openedWish.message}</p>
+              </div>
+              {ownedIds.has(openedWish.id) && (
+                <button
+                  type="button"
+                  className="wishes-modal__delete font-body"
+                  onClick={() => handleDelete(openedWish.id)}
+                  disabled={deletingId === openedWish.id}
+                >
+                  {deletingId === openedWish.id ? 'جاري الحذف...' : 'حذف التهنئة'}
+                </button>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.section>
   );
 }
