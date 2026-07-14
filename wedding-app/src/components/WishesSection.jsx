@@ -9,12 +9,13 @@ import {
 import { scrollReveal, scrollTransition, scrollViewport } from './scrollAnimations';
 import './WishesSection.css';
 
-const PREVIEW_LENGTH = 90;
+/** عدد الأحرف الظاهرة قبل الاختصار */
+const PREVIEW_LENGTH = 55;
 
 function WishCard({ wish, owned, deleting, onDelete, onOpen }) {
-  const isLong = wish.message.length > PREVIEW_LENGTH;
+  const isLong = wish.message.length > PREVIEW_LENGTH || wish.message.includes('\n');
   const preview = isLong
-    ? `${wish.message.slice(0, PREVIEW_LENGTH).trim()}…`
+    ? `${wish.message.replace(/\s+/g, ' ').slice(0, PREVIEW_LENGTH).trim()}…`
     : wish.message;
 
   return (
@@ -39,11 +40,11 @@ function WishCard({ wish, owned, deleting, onDelete, onOpen }) {
 
       <button
         type="button"
-        className={`wishes-list__message font-verse${isLong ? ' wishes-list__message--truncatable' : ''}`}
-        onClick={() => onOpen(wish)}
+        className={`wishes-list__message font-verse${isLong ? ' wishes-list__message--long' : ''}`}
+        onClick={() => isLong && onOpen(wish)}
         aria-label={isLong ? 'عرض الرسالة كاملة' : undefined}
       >
-        {preview}
+        <span className="wishes-list__message-text">{preview}</span>
         {isLong && <span className="wishes-list__more">اضغط للقراءة</span>}
       </button>
     </li>
@@ -224,18 +225,23 @@ export default function WishesSection() {
         ) : wishes.length === 0 ? (
           <p className="wishes-list__empty font-body">كن أول من يهنّئ العرسان ♥</p>
         ) : (
-          <ul className="wishes-list__items">
-            {wishes.map((wish) => (
-              <WishCard
-                key={wish.id}
-                wish={wish}
-                owned={ownedIds.has(wish.id)}
-                deleting={deletingId === wish.id}
-                onDelete={handleDelete}
-                onOpen={setOpenedWish}
-              />
-            ))}
-          </ul>
+          <>
+            <ul className="wishes-list__items" aria-label="قائمة التهاني">
+              {wishes.map((wish) => (
+                <WishCard
+                  key={wish.id}
+                  wish={wish}
+                  owned={ownedIds.has(wish.id)}
+                  deleting={deletingId === wish.id}
+                  onDelete={handleDelete}
+                  onOpen={setOpenedWish}
+                />
+              ))}
+            </ul>
+            {wishes.length > 3 && (
+              <p className="wishes-list__hint font-body">مرّر للأسفل لرؤية المزيد</p>
+            )}
+          </>
         )}
       </div>
 
