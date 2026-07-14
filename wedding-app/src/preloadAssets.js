@@ -32,12 +32,11 @@ function withTimeout(promise, ms) {
   ]);
 }
 
-/** يبدأ تحميل الصوت دون انتظار اكتماله */
+/** يحمّل الأغنية عبر العنصر نفسه عند الظهور — بدون عنصر Audio منفصل */
 export function warmAudio() {
-  const audio = new Audio();
-  audio.preload = 'auto';
-  audio.src = AUDIO_SRC;
-  audio.load();
+  // يُبقى الرابط في الكاش عبر fetch مبكر خفيف
+  if (typeof fetch !== 'function') return;
+  fetch(AUDIO_SRC, { method: 'GET', cache: 'force-cache' }).catch(() => {});
 }
 
 export function preloadRestImages() {

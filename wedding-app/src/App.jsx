@@ -31,19 +31,20 @@ export default function App() {
   }, [showInvite]);
 
   const playAudio = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.currentTime = 0;
-    audio.play().catch(() => {});
+    // يجب استدعاء التشغيل مباشرة داخل ضغطة المستخدم (موبايل)
+    audioRef.current?.playFromStart?.();
   }, []);
 
   const handleLiftStart = () => {
     setStarted(true);
     setShowInvite(true);
+    // محاولة إضافية مباشرة بعد فتح الكرت
+    audioRef.current?.playFromStart?.();
   };
 
   const handleLiftEnd = () => {
     setHideIntro(true);
+    audioRef.current?.playFromStart?.();
   };
 
   return (
