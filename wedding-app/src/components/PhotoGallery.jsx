@@ -126,6 +126,14 @@ export function PhotoGroomHero({ src, title, caption, position = 'center 28%', d
       transition={photoTransition(delay)}
       aria-label={title}
     >
+      {title && (
+        <div className="photo-groom-hero__heading">
+          <span className="photo-groom-hero__line" aria-hidden="true" />
+          <h1 className="photo-groom-hero__title font-display">{title}</h1>
+          <span className="photo-groom-hero__line" aria-hidden="true" />
+        </div>
+      )}
+
       <div className="photo-groom-hero__frame">
         <img
           src={src}
@@ -134,22 +142,13 @@ export function PhotoGroomHero({ src, title, caption, position = 'center 28%', d
           loading="eager"
           style={{ objectPosition: position }}
         />
-        <div className="photo-groom-hero__overlay" aria-hidden="true">
-          {title && (
-            <div className="photo-groom-hero__top">
-              <span className="photo-groom-hero__line" />
-              <h1 className="photo-groom-hero__title font-display">{title}</h1>
-              <span className="photo-groom-hero__line" />
-            </div>
-          )}
-          {caption && (
-            <div className="photo-groom-hero__bottom">
-              <span className="photo-groom-hero__line" />
-              <p className="photo-groom-hero__caption font-display">{caption}</p>
-              <span className="photo-groom-hero__line" />
-            </div>
-          )}
-        </div>
+        {caption && (
+          <div className="photo-groom-hero__bottom" aria-hidden="true">
+            <span className="photo-groom-hero__line" />
+            <p className="photo-groom-hero__caption font-display">{caption}</p>
+            <span className="photo-groom-hero__line" />
+          </div>
+        )}
       </div>
     </motion.figure>
   );

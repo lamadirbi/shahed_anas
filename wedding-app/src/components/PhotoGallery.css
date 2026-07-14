@@ -30,14 +30,26 @@
   margin: calc(-1 * var(--space-xl)) calc(-1 * var(--space-md)) 0;
   width: calc(100% + var(--space-md) * 2);
   padding: 0;
-  aspect-ratio: 3 / 4;
-  max-height: min(78dvh, 580px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.photo-groom-hero__heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+  padding: var(--space-lg) var(--space-md) var(--space-md);
+  background: none;
 }
 
 .photo-groom-hero__frame {
   position: relative;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: min(72dvh, 540px);
   overflow: hidden;
   box-shadow: 0 12px 40px rgba(58, 15, 26, 0.22);
 }
@@ -47,68 +59,37 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 38%;
+  object-position: center 32%;
   background: var(--beige-light);
 }
 
-.photo-groom-hero__overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0;
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(20, 6, 10, 0.92) 0%,
-      rgba(58, 15, 26, 0.45) 12%,
-      transparent 26%
-    ),
-    linear-gradient(
-      to top,
-      rgba(20, 6, 10, 0.9) 0%,
-      rgba(58, 15, 26, 0.5) 32%,
-      transparent 58%
-    );
-  pointer-events: none;
-}
-
-.photo-groom-hero__top,
 .photo-groom-hero__bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   text-align: center;
-}
-
-.photo-groom-hero__top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: var(--space-lg) var(--space-lg) var(--space-xs);
-  padding-top: clamp(28px, 7vw, 40px);
-}
-
-.photo-groom-hero__bottom {
   padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  background: none;
+  pointer-events: none;
 }
 
 .photo-groom-hero__line {
   width: clamp(48px, 18vw, 72px);
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold-shimmer), transparent);
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
-.photo-groom-hero__top .photo-groom-hero__line:first-child {
-  margin-bottom: 6px;
+.photo-groom-hero__heading .photo-groom-hero__line:first-child {
+  margin-bottom: 8px;
 }
 
-.photo-groom-hero__top .photo-groom-hero__line:last-child {
-  margin-top: 6px;
+.photo-groom-hero__heading .photo-groom-hero__line:last-child {
+  margin-top: 8px;
 }
 
 .photo-groom-hero__bottom .photo-groom-hero__line:first-child {
@@ -120,22 +101,19 @@
 }
 
 .photo-groom-hero__title {
-  font-size: clamp(1.15rem, 5.5vw, 1.75rem);
-  color: var(--gold-shimmer);
-  line-height: 1.35;
-  text-shadow:
-    0 2px 24px rgba(0, 0, 0, 0.6),
-    0 0 48px rgba(212, 176, 106, 0.2);
+  font-size: clamp(1.45rem, 6.5vw, 2.05rem);
+  color: var(--burgundy-dark);
+  line-height: 1.4;
   letter-spacing: 0.02em;
+  text-shadow: none;
+  background: none;
 }
 
 .photo-groom-hero__caption {
-  font-size: clamp(1.35rem, 6.2vw, 2rem);
+  font-size: clamp(1.2rem, 5.5vw, 1.75rem);
   color: #fff8f0;
   line-height: 1.45;
-  text-shadow:
-    0 2px 20px rgba(0, 0, 0, 0.55),
-    0 0 36px rgba(212, 176, 106, 0.22);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
   letter-spacing: 0.02em;
 }
 
