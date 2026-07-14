@@ -1,0 +1,80 @@
+:root {
+  --burgundy: #5c1828;
+  --burgundy-dark: #3a0f1a;
+  --burgundy-light: #7a2435;
+  --beige: #f0e4d0;
+  --beige-dark: #d4c4a8;
+  --beige-light: #faf6f0;
+  --gold: #b8943f;
+  --gold-light: #d4b06a;
+  --gold-shimmer: #e8cc82;
+  --cream: #fffdf9;
+  --text-dark: #2e1a22;
+  --text-muted: #6e5e58;
+
+  --page-max: 430px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+
+  --font-verse: var(--font-amiri), 'Amiri', serif;
+  --font-body: var(--font-el-messiri), 'El Messiri', 'Tahoma', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100dvh;
+}
+
+body {
+  font-family: var(--font-body);
+  background: #1a0a0e;
+  color: var(--cream);
+  direction: rtl;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-amiri {
+  font-family: var(--font-verse);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--burgundy-light);
+  border-radius: 3px;
+}
