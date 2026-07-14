@@ -70,7 +70,7 @@ export default function InvitationCard() {
             <span className="card__eyebrow font-body">يتشرف كل من</span>
             <div className="gold-line" />
             <div className="parents-row">
-              <p className="parents-row__name font-verse">السيد معين حمزة حنيف</p>
+              <p className="parents-row__name font-verse">رجل الأعمال السيد / معين حمزة حنيف</p>
               <span className="parents-row__gem" aria-hidden="true" />
               <p className="parents-row__name font-verse">الحاج محمد صلاح قشطة</p>
             </div>
@@ -83,7 +83,7 @@ export default function InvitationCard() {
             <div className="couple-row">
               <div className="couple-row__side">
                 <span className="couple-row__tag font-body">المحاسب</span>
-                <p className="couple-row__name">أنس معين حنيف</p>
+                <p className="couple-row__name">أنس معين حنيف (كرم)</p>
               </div>
               <span className="couple-row__heart" aria-hidden="true">♥</span>
               <div className="couple-row__side">
