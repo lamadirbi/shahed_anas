@@ -3,6 +3,7 @@ import Countdown from './Countdown';
 import EventDetails from './EventDetails';
 import { PhotoGroomHero, PhotoPair, PhotoSingle } from './PhotoGallery';
 import { Reveal, scrollReveal, scrollTransition, scrollViewport } from './scrollAnimations';
+import WishesSection from './WishesSection';
 import './InvitationCard.css';
 
 function Ornament({ size = 'md' }) {
@@ -145,6 +146,11 @@ export default function InvitationCard() {
             <p className="closing__sub font-verse">نتشرف بحضوركم ومشاركتكم أجمل لحظاتنا</p>
             <Ornament />
           </LuxeCard>
+
+          <SectionBreak label="تهاني" delay={0.05} />
+
+          {/* ١٠ — تهاني المعازيم */}
+          <WishesSection />
         </main>
       </div>
     </div>

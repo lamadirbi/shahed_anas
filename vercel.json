@@ -1,4 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs"
+  "installCommand": "npm install && cd wedding-app && npm install",
+  "buildCommand": "cd wedding-app && npm run build",
+  "outputDirectory": "wedding-app/dist",
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
 }

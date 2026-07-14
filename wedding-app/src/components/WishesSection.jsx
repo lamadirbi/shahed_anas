@@ -1,30 +1,27 @@
-'use client';
-
 import { useCallback, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   canDeleteWish,
   getStoredDeleteTokens,
   removeStoredDeleteToken,
   storeDeleteToken,
-  type PublicWish,
-} from '@/lib/wishes';
-import styles from './WishesSection.module.css';
-
-type SubmitState = 'idle' | 'loading' | 'success' | 'error';
+} from '../lib/wishes';
+import { scrollReveal, scrollTransition, scrollViewport } from './scrollAnimations';
+import './WishesSection.css';
 
 export default function WishesSection() {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
-  const [wishes, setWishes] = useState<PublicWish[]>([]);
-  const [submitState, setSubmitState] = useState<SubmitState>('idle');
+  const [wishes, setWishes] = useState([]);
+  const [submitState, setSubmitState] = useState('idle');
   const [error, setError] = useState('');
   const [loadingWishes, setLoadingWishes] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const fetchWishes = useCallback(async () => {
     try {
       const res = await fetch('/api/wishes');
-      const data = (await res.json()) as { wishes?: PublicWish[] };
+      const data = await res.json();
       setWishes(data.wishes ?? []);
     } catch {
       setError('تعذّر تحميل التهاني');
@@ -37,7 +34,7 @@ export default function WishesSection() {
     fetchWishes();
   }, [fetchWishes]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setSubmitState('loading');
     setError('');
@@ -49,11 +46,7 @@ export default function WishesSection() {
         body: JSON.stringify({ name, message }),
       });
 
-      const data = (await res.json()) as {
-        wish?: PublicWish;
-        deleteToken?: string;
-        error?: string;
-      };
+      const data = await res.json();
 
       if (!res.ok) {
         setSubmitState('error');
@@ -63,7 +56,7 @@ export default function WishesSection() {
 
       if (data.wish && data.deleteToken) {
         storeDeleteToken(data.wish.id, data.deleteToken);
-        setWishes((prev) => [data.wish!, ...prev]);
+        setWishes((prev) => [data.wish, ...prev]);
       }
 
       setName('');
@@ -76,10 +69,9 @@ export default function WishesSection() {
     }
   }
 
-  async function handleDelete(wishId: string) {
+  async function handleDelete(wishId) {
     const tokens = getStoredDeleteTokens();
     const deleteToken = tokens[wishId];
-
     if (!deleteToken) return;
 
     setDeletingId(wishId);
@@ -92,7 +84,7 @@ export default function WishesSection() {
         body: JSON.stringify({ id: wishId, deleteToken }),
       });
 
-      const data = (await res.json()) as { error?: string };
+      const data = await res.json();
 
       if (!res.ok) {
         setError(data.error ?? 'تعذّر حذف التهنئة');
@@ -109,19 +101,25 @@ export default function WishesSection() {
   }
 
   return (
-    <section className={styles.section} id="wishes">
-      <div className={styles.header}>
-        <span className={styles.eyebrow}>سجّلي تهنئتك</span>
-        <h2 className={`${styles.title} font-amiri`}>تهاني المعازيم</h2>
-        <p className={styles.subtitle}>
-          اكتبي اسمك ورسالتك الجميلة لأنس وشهد — ستُعرض هنا ليراها العرسان
-        </p>
-        <div className={styles.goldLine} />
-      </div>
+    <motion.section
+      className="wishes-section"
+      id="wishes"
+      variants={scrollReveal}
+      initial="hidden"
+      whileInView="visible"
+      viewport={scrollViewport}
+      transition={scrollTransition(0)}
+    >
+      <span className="wishes-section__eyebrow font-body">سجّلي تهنئتك</span>
+      <h3 className="wishes-section__title font-display">تهاني المعازيم</h3>
+      <p className="wishes-section__subtitle font-body">
+        اكتبي اسمك ورسالتك الجميلة لأنس وشهد — ستُعرض هنا ليراها العرسان
+      </p>
+      <div className="gold-line" />
 
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <label className={styles.field}>
-          <span className={styles.label}>الاسم</span>
+      <form className="wishes-form" onSubmit={handleSubmit}>
+        <label className="wishes-form__field">
+          <span className="wishes-form__label font-body">الاسم</span>
           <input
             type="text"
             value={name}
@@ -129,12 +127,12 @@ export default function WishesSection() {
             placeholder="اسمك الكريم"
             maxLength={80}
             required
-            className={styles.input}
+            className="wishes-form__input font-body"
           />
         </label>
 
-        <label className={styles.field}>
-          <span className={styles.label}>رسالة التهنئة</span>
+        <label className="wishes-form__field">
+          <span className="wishes-form__label font-body">رسالة التهنئة</span>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -142,42 +140,44 @@ export default function WishesSection() {
             maxLength={500}
             required
             rows={4}
-            className={`${styles.textarea} font-amiri`}
+            className="wishes-form__textarea font-verse"
           />
         </label>
 
-        {error && <p className={styles.error}>{error}</p>}
+        {error && <p className="wishes-form__error">{error}</p>}
 
         <button
           type="submit"
-          className={styles.submitBtn}
+          className="wishes-form__submit font-body"
           disabled={submitState === 'loading'}
         >
           {submitState === 'loading' ? 'جاري الإرسال...' : 'إرسال التهنئة ♥'}
         </button>
 
         {submitState === 'success' && (
-          <p className={styles.success}>تم إرسال تهنئتك بنجاح! شكراً لمشاركتكم الفرح</p>
+          <p className="wishes-form__success font-body">
+            تم إرسال تهنئتك بنجاح! شكراً لمشاركتكم الفرح
+          </p>
         )}
       </form>
 
-      <div className={styles.listWrap}>
-        <h3 className={`${styles.listTitle} font-amiri`}>التهاني</h3>
+      <div className="wishes-list">
+        <h4 className="wishes-list__title font-display">التهاني</h4>
 
         {loadingWishes ? (
-          <p className={styles.empty}>جاري تحميل التهاني...</p>
+          <p className="wishes-list__empty font-body">جاري تحميل التهاني...</p>
         ) : wishes.length === 0 ? (
-          <p className={styles.empty}>كن أول من يهنّئ العرسان ♥</p>
+          <p className="wishes-list__empty font-body">كن أول من يهنّئ العرسان ♥</p>
         ) : (
-          <ul className={styles.list}>
+          <ul className="wishes-list__items">
             {wishes.map((wish) => (
-              <li key={wish.id} className={styles.card}>
-                <div className={styles.cardHeader}>
-                  <span className={`${styles.cardName} font-amiri`}>{wish.name}</span>
+              <li key={wish.id} className="wishes-list__card">
+                <div className="wishes-list__card-header">
+                  <span className="wishes-list__name font-verse">{wish.name}</span>
                   {canDeleteWish(wish.id) && (
                     <button
                       type="button"
-                      className={styles.deleteBtn}
+                      className="wishes-list__delete font-body"
                       onClick={() => handleDelete(wish.id)}
                       disabled={deletingId === wish.id}
                       aria-label="حذف تهنئتي"
@@ -186,12 +186,12 @@ export default function WishesSection() {
                     </button>
                   )}
                 </div>
-                <p className={`${styles.cardMessage} font-amiri`}>{wish.message}</p>
+                <p className="wishes-list__message font-verse">{wish.message}</p>
               </li>
             ))}
           </ul>
         )}
       </div>
-    </section>
+    </motion.section>
   );
 }
