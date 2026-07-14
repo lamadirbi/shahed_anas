@@ -5,19 +5,26 @@ function tryPlay(audio) {
   if (!audio) return Promise.resolve();
 
   audio.loop = true;
-  try {
-    if (audio.currentTime > 0.05) {
-      audio.currentTime = 0;
-    }
-  } catch {
-    /* ignore seek errors before metadata */
-  }
 
-  const playPromise = audio.play();
+  const start = () => {
+    try {
+      audio.currentTime = 0;
+    } catch {
+      /* ignore seek errors before metadata */
+    }
+    return audio.play();
+  };
+
+  const playPromise = start();
   if (playPromise && typeof playPromise.then === 'function') {
     return playPromise.catch(() => {
       const retry = () => {
         audio.removeEventListener('canplay', retry);
+        try {
+          audio.currentTime = 0;
+        } catch {
+          /* ignore */
+        }
         audio.play().catch(() => {});
       };
       audio.addEventListener('canplay', retry, { once: true });

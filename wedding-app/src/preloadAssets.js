@@ -13,7 +13,7 @@ export const REST_IMAGES = [
   '/images/photo-6.jpg',
 ];
 
-export const AUDIO_SRC = '/audio/song.m4a';
+export const AUDIO_SRC = '/audio/song.m4a?v=short';
 
 function preloadImage(src) {
   return new Promise((resolve) => {
