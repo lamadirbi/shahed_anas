@@ -1,4 +1,5 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { AUDIO_SRC } from '../preloadAssets';
 
 const AudioPlayer = forwardRef(function AudioPlayer({ started }, ref) {
   const audioRef = useRef(null);
@@ -18,7 +19,7 @@ const AudioPlayer = forwardRef(function AudioPlayer({ started }, ref) {
   return (
     <>
       <audio ref={audioRef} loop preload="auto">
-        <source src="/audio/song.mp4" type="audio/mp4" />
+        <source src={AUDIO_SRC} type="audio/mp4" />
       </audio>
       {started && (
         <button className="audio-btn" onClick={toggle} aria-label="تشغيل الموسيقى">

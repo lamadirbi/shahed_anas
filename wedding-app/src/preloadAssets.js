@@ -1,37 +1,63 @@
-export const INVITATION_IMAGES = [
+/** صور تظهر فوراً مع فتح الظرف */
+export const CRITICAL_IMAGES = [
+  '/images/couple-outdoor.jpg',
   '/images/groom-formal.jpg',
+];
+
+/** باقي صور الدعوة — تُحمَّل في الخلفية بعد الفتح */
+export const REST_IMAGES = [
   '/images/bride.jpg',
   '/images/hands.jpg',
-  '/images/couple-outdoor.jpg',
   '/images/car.jpg',
   '/images/photo-5.jpg',
   '/images/photo-6.jpg',
 ];
 
-const AUDIO_SRC = '/audio/song.mp4';
+export const AUDIO_SRC = '/audio/song.m4a';
 
 function preloadImage(src) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve(src);
     img.onerror = () => resolve(src);
+    img.decoding = 'async';
     img.src = src;
   });
 }
 
-function preloadAudio() {
-  return new Promise((resolve) => {
-    const audio = new Audio();
-    const done = () => resolve(AUDIO_SRC);
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => setTimeout(resolve, ms)),
+  ]);
+}
 
-    audio.addEventListener('canplaythrough', done, { once: true });
-    audio.addEventListener('error', done, { once: true });
-    audio.preload = 'auto';
-    audio.src = AUDIO_SRC;
-    audio.load();
+/** يبدأ تحميل الصوت دون انتظار اكتماله */
+export function warmAudio() {
+  const audio = new Audio();
+  audio.preload = 'auto';
+  audio.src = AUDIO_SRC;
+  audio.load();
+}
+
+export function preloadRestImages() {
+  REST_IMAGES.forEach((src) => {
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = src;
   });
 }
 
+/**
+ * يفتح الظرف بسرعة: ينتظر الصور الحرجة فقط (مع مهلة قصوى)،
+ * ويبدأ تحميل الصوت وباقي الصور في الخلفية.
+ */
 export function preloadInvitationAssets() {
-  return Promise.all([...INVITATION_IMAGES.map(preloadImage), preloadAudio()]);
+  warmAudio();
+  preloadRestImages();
+
+  return withTimeout(
+    Promise.all(CRITICAL_IMAGES.map(preloadImage)),
+    1800,
+  );
 }
