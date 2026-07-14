@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { kv } from '@vercel/kv';
 import {
   WISHES_KEY,
   generateDeleteToken,
@@ -10,24 +9,23 @@ import {
   toPublicWish,
   type Wish,
 } from '../lib/wishes';
-
-function kvConfigured(): boolean {
-  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
-}
+import { redisConfigured, withRedis } from '../lib/redis';
 
 async function readWishes(): Promise<Wish[]> {
-  const raw = await kv.lrange(WISHES_KEY, 0, -1);
-  if (!Array.isArray(raw)) return [];
+  return withRedis(async (redis) => {
+    const raw = await redis.lRange(WISHES_KEY, 0, -1);
+    if (!Array.isArray(raw)) return [];
 
-  return raw
-    .map(parseWish)
-    .filter((wish): wish is Wish => wish !== null)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return raw
+      .map(parseWish)
+      .filter((wish): wish is Wish => wish !== null)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  });
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
-    if (!kvConfigured()) {
+    if (!redisConfigured()) {
       return res.status(200).json({ wishes: [], error: 'التخزين غير مُعدّ بعد' });
     }
 
@@ -40,12 +38,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method === 'POST') {
-    if (!kvConfigured()) {
+    if (!redisConfigured()) {
       return res.status(503).json({ error: 'التخزين غير مُعدّ بعد' });
     }
 
     try {
-      const body = req.body as { name?: string; message?: string };
+      const body = (typeof req.body === 'string' ? JSON.parse(req.body) : req.body) as {
+        name?: string;
+        message?: string;
+      };
       const name = sanitizeName(body.name ?? '');
       const message = sanitizeMessage(body.message ?? '');
 
@@ -65,7 +66,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         deleteToken: generateDeleteToken(),
       };
 
-      await kv.lpush(WISHES_KEY, JSON.stringify(wish));
+      await withRedis(async (redis) => {
+        await redis.lPush(WISHES_KEY, JSON.stringify(wish));
+      });
 
       return res.status(200).json({
         wish: toPublicWish(wish),
@@ -77,12 +80,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method === 'DELETE') {
-    if (!kvConfigured()) {
+    if (!redisConfigured()) {
       return res.status(503).json({ error: 'التخزين غير مُعدّ بعد' });
     }
 
     try {
-      const body = req.body as { id?: string; deleteToken?: string };
+      const body = (typeof req.body === 'string' ? JSON.parse(req.body) : req.body) as {
+        id?: string;
+        deleteToken?: string;
+      };
       const id = body.id?.trim();
       const deleteToken = body.deleteToken?.trim();
 
@@ -103,13 +109,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const remaining = wishes.filter((wish) => wish.id !== id);
 
-      await kv.del(WISHES_KEY);
-      if (remaining.length > 0) {
-        await kv.lpush(
-          WISHES_KEY,
-          ...remaining.map((wish) => JSON.stringify(wish)).reverse(),
-        );
-      }
+      await withRedis(async (redis) => {
+        await redis.del(WISHES_KEY);
+        if (remaining.length > 0) {
+          await redis.lPush(
+            WISHES_KEY,
+            ...remaining.map((wish) => JSON.stringify(wish)).reverse(),
+          );
+        }
+      });
 
       return res.status(200).json({ success: true });
     } catch {
