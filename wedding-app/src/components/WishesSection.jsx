@@ -65,7 +65,7 @@ export default function WishesSection() {
       setTimeout(() => setSubmitState('idle'), 3000);
     } catch {
       setSubmitState('error');
-      setError('تعذّر إرسال التهنئة، حاولي مرة أخرى');
+      setError('تعذّر إرسال التهنئة، حاول مرة أخرى');
     }
   }
 
@@ -110,10 +110,10 @@ export default function WishesSection() {
       viewport={scrollViewport}
       transition={scrollTransition(0)}
     >
-      <span className="wishes-section__eyebrow font-body">سجّلي تهنئتك</span>
+      <span className="wishes-section__eyebrow font-body">سجّل تهنئتك</span>
       <h3 className="wishes-section__title font-display">تهاني المعازيم</h3>
       <p className="wishes-section__subtitle font-body">
-        اكتبي اسمك ورسالتك الجميلة لأنس وشهد — ستُعرض هنا ليراها العرسان
+        اكتب اسمك ورسالتك الجميلة لأنس وشهد — ستُعرض هنا ليراها العرسان
       </p>
       <div className="gold-line" />
 
@@ -124,7 +124,7 @@ export default function WishesSection() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="اسمك الكريم"
+            placeholder="اسمك"
             maxLength={80}
             required
             className="wishes-form__input font-body"
@@ -136,7 +136,7 @@ export default function WishesSection() {
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="اكتبي تهنئتك للعرسان هنا..."
+            placeholder="اكتب تهنئتك للعرسان هنا..."
             maxLength={500}
             required
             rows={4}
