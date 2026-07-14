@@ -70,9 +70,15 @@ export default function InvitationCard() {
             <span className="card__eyebrow font-body">يتشرف كل من</span>
             <div className="gold-line" />
             <div className="parents-row">
-              <p className="parents-row__name font-verse">رجل الأعمال السيد / معين حمزة حنيف</p>
+              <div className="parents-row__side">
+                <span className="parents-row__title font-body">رجل الأعمال السيد</span>
+                <p className="parents-row__name font-verse">معين حمزة حنيف</p>
+              </div>
               <span className="parents-row__gem" aria-hidden="true" />
-              <p className="parents-row__name font-verse">الحاج محمد صلاح قشطة</p>
+              <div className="parents-row__side">
+                <span className="parents-row__title font-body">الحاج</span>
+                <p className="parents-row__name font-verse">محمد صلاح قشطة</p>
+              </div>
             </div>
           </LuxeCard>
 
