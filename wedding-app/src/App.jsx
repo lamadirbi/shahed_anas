@@ -12,6 +12,7 @@ export default function App() {
   const [started, setStarted] = useState(false);
   const [assetsReady, setAssetsReady] = useState(false);
   const audioRef = useRef(null);
+  const audioStartedRef = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -30,21 +31,20 @@ export default function App() {
     return () => document.body.classList.remove('invitation-open');
   }, [showInvite]);
 
-  const playAudio = useCallback(() => {
-    // يجب استدعاء التشغيل مباشرة داخل ضغطة المستخدم (موبايل)
+  const playAudioOnce = useCallback(() => {
+    if (audioStartedRef.current) return;
+    audioStartedRef.current = true;
     audioRef.current?.playFromStart?.();
   }, []);
 
   const handleLiftStart = () => {
+    playAudioOnce();
     setStarted(true);
     setShowInvite(true);
-    // محاولة إضافية مباشرة بعد فتح الكرت
-    audioRef.current?.playFromStart?.();
   };
 
   const handleLiftEnd = () => {
     setHideIntro(true);
-    audioRef.current?.playFromStart?.();
   };
 
   return (
@@ -60,7 +60,7 @@ export default function App() {
           <IntroEnvelope
             key="intro"
             ready={assetsReady}
-            onPlayAudio={playAudio}
+            onPlayAudio={playAudioOnce}
             onLiftStart={handleLiftStart}
             onLiftEnd={handleLiftEnd}
           />

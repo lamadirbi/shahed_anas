@@ -6,16 +6,13 @@ function tryPlay(audio) {
 
   audio.loop = true;
 
-  const start = () => {
-    try {
-      audio.currentTime = 0;
-    } catch {
-      /* ignore seek errors before metadata */
-    }
-    return audio.play();
-  };
+  try {
+    audio.currentTime = 0;
+  } catch {
+    /* ignore seek errors before metadata */
+  }
 
-  const playPromise = start();
+  const playPromise = audio.play();
   if (playPromise && typeof playPromise.then === 'function') {
     return playPromise.catch(() => {
       const retry = () => {
@@ -74,16 +71,11 @@ const AudioPlayer = forwardRef(function AudioPlayer({ started }, ref) {
     return () => audio.removeEventListener('ended', keepLooping);
   }, []);
 
-  useEffect(() => {
-    if (!started) return;
-    tryPlay(audioRef.current);
-  }, [started]);
-
   const toggle = () => {
     const a = audioRef.current;
     if (!a) return;
     if (a.paused) {
-      tryPlay(a);
+      a.play().catch(() => {});
     } else {
       a.pause();
     }
