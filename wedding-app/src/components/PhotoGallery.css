@@ -27,7 +27,7 @@
 
 /* ── غلاف العريس ── */
 .photo-groom-hero {
-  margin: calc(-1 * var(--space-xl)) calc(-1 * var(--space-md)) 0;
+  margin: 0 calc(-1 * var(--space-md)) 0;
   width: calc(100% + var(--space-md) * 2);
   padding: 0;
   display: flex;
@@ -41,8 +41,21 @@
   align-items: center;
   width: 100%;
   text-align: center;
-  padding: var(--space-lg) var(--space-md) var(--space-md);
+  /* ابعد الجملة عن بوردر الصفحة */
+  padding: calc(18px + var(--space-md)) var(--space-xl) var(--space-md);
+  box-sizing: border-box;
   background: none;
+}
+
+.photo-groom-hero__title {
+  font-size: clamp(1.45rem, 6.5vw, 2.05rem);
+  color: var(--burgundy-dark);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  text-shadow: none;
+  background: none;
+  max-width: 92%;
+  margin: 0 auto;
 }
 
 .photo-groom-hero__frame {
@@ -98,15 +111,6 @@
 
 .photo-groom-hero__bottom .photo-groom-hero__line:last-child {
   margin-top: var(--space-sm);
-}
-
-.photo-groom-hero__title {
-  font-size: clamp(1.45rem, 6.5vw, 2.05rem);
-  color: var(--burgundy-dark);
-  line-height: 1.4;
-  letter-spacing: 0.02em;
-  text-shadow: none;
-  background: none;
 }
 
 .photo-groom-hero__caption {
