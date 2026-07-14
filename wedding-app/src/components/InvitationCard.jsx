@@ -137,20 +137,20 @@ export default function InvitationCard() {
             delay={0.08}
           />
 
+          <SectionBreak label="تهاني" delay={0.05} />
+
+          {/* ٩ — تهاني المعازيم */}
+          <WishesSection />
+
           <SectionBreak delay={0.05} />
 
-          {/* ٩ — الختام */}
+          {/* ١٠ — الختام */}
           <LuxeCard variant="closing" delay={0}>
             <div className="closing-arch" />
             <h3 className="closing__title font-display">حضوركم يزيد فرحتنا</h3>
             <p className="closing__sub font-verse">نتشرف بحضوركم ومشاركتكم أجمل لحظاتنا</p>
             <Ornament />
           </LuxeCard>
-
-          <SectionBreak label="تهاني" delay={0.05} />
-
-          {/* ١٠ — تهاني المعازيم */}
-          <WishesSection />
         </main>
       </div>
     </div>
