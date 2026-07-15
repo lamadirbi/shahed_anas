@@ -1,18 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  canDeleteWish,
-  getStoredDeleteTokens,
-  removeStoredDeleteToken,
-  storeDeleteToken,
-} from '../lib/wishes';
 import { scrollReveal, scrollTransition, scrollViewport } from './scrollAnimations';
 import './WishesSection.css';
 
 /** عدد الأحرف الظاهرة قبل الاختصار */
 const PREVIEW_LENGTH = 55;
 
-function WishCard({ wish, owned, deleting, onDelete, onOpen }) {
+function WishCard({ wish, onOpen }) {
   const isLong = wish.message.length > PREVIEW_LENGTH || wish.message.includes('\n');
   const preview = isLong
     ? `${wish.message.replace(/\s+/g, ' ').slice(0, PREVIEW_LENGTH).trim()}…`
@@ -22,20 +16,6 @@ function WishCard({ wish, owned, deleting, onDelete, onOpen }) {
     <li className="wishes-list__card">
       <div className="wishes-list__card-header">
         <span className="wishes-list__name font-verse">{wish.name}</span>
-        {owned && (
-          <button
-            type="button"
-            className="wishes-list__delete font-body"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(wish.id);
-            }}
-            disabled={deleting}
-            aria-label="حذف التهنئة"
-          >
-            {deleting ? '...' : 'حذف'}
-          </button>
-        )}
       </div>
 
       <button
@@ -55,33 +35,28 @@ export default function WishesSection() {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [wishes, setWishes] = useState([]);
-  const [ownedIds, setOwnedIds] = useState(() => new Set());
   const [submitState, setSubmitState] = useState('idle');
   const [error, setError] = useState('');
   const [loadingWishes, setLoadingWishes] = useState(true);
-  const [deletingId, setDeletingId] = useState(null);
   const [openedWish, setOpenedWish] = useState(null);
-
-  const refreshOwnedIds = useCallback(() => {
-    const tokens = getStoredDeleteTokens();
-    setOwnedIds(new Set(Object.keys(tokens)));
-  }, []);
 
   const fetchWishes = useCallback(async () => {
     try {
       const res = await fetch('/api/wishes');
       const data = await res.json();
       setWishes(data.wishes ?? []);
-      refreshOwnedIds();
     } catch {
       setError('تعذّر تحميل التهاني');
     } finally {
       setLoadingWishes(false);
     }
-  }, [refreshOwnedIds]);
+  }, []);
 
   useEffect(() => {
     fetchWishes();
+    // تحديث دوري حتى تظهر التهاني الجديدة للجميع
+    const timer = setInterval(fetchWishes, 20000);
+    return () => clearInterval(timer);
   }, [fetchWishes]);
 
   async function handleSubmit(e) {
@@ -104,55 +79,21 @@ export default function WishesSection() {
         return;
       }
 
-      if (data.wish && data.deleteToken) {
-        storeDeleteToken(data.wish.id, data.deleteToken);
-        refreshOwnedIds();
-        setWishes((prev) => [data.wish, ...prev]);
+      if (data.wish) {
+        setWishes((prev) => {
+          if (prev.some((w) => w.id === data.wish.id)) return prev;
+          return [data.wish, ...prev];
+        });
       }
 
       setName('');
       setMessage('');
       setSubmitState('success');
       setTimeout(() => setSubmitState('idle'), 3000);
+      fetchWishes();
     } catch {
       setSubmitState('error');
       setError('تعذّر إرسال التهنئة، حاول مرة أخرى');
-    }
-  }
-
-  async function handleDelete(wishId) {
-    if (!canDeleteWish(wishId)) return;
-    if (!window.confirm('هل تريد حذف هذه التهنئة؟')) return;
-
-    const tokens = getStoredDeleteTokens();
-    const deleteToken = tokens[wishId];
-    if (!deleteToken) return;
-
-    setDeletingId(wishId);
-    setError('');
-
-    try {
-      const res = await fetch('/api/wishes', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: wishId, deleteToken }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error ?? 'تعذّر حذف التهنئة');
-        return;
-      }
-
-      removeStoredDeleteToken(wishId);
-      refreshOwnedIds();
-      setWishes((prev) => prev.filter((wish) => wish.id !== wishId));
-      if (openedWish?.id === wishId) setOpenedWish(null);
-    } catch {
-      setError('تعذّر حذف التهنئة');
-    } finally {
-      setDeletingId(null);
     }
   }
 
@@ -212,13 +153,16 @@ export default function WishesSection() {
 
         {submitState === 'success' && (
           <p className="wishes-form__success font-body">
-            تم إرسال تهنئتك بنجاح! يمكنك حذفها من نفس الجهاز لاحقاً
+            تم إرسال تهنئتك بنجاح! ستبقى محفوظة دائماً
           </p>
         )}
       </form>
 
       <div className="wishes-list">
         <h4 className="wishes-list__title font-display">التهاني</h4>
+        {!loadingWishes && wishes.length > 0 && (
+          <p className="wishes-list__count font-body">{wishes.length} تهنئة</p>
+        )}
 
         {loadingWishes ? (
           <p className="wishes-list__empty font-body">جاري تحميل التهاني...</p>
@@ -228,18 +172,11 @@ export default function WishesSection() {
           <>
             <ul className="wishes-list__items" aria-label="قائمة التهاني">
               {wishes.map((wish) => (
-                <WishCard
-                  key={wish.id}
-                  wish={wish}
-                  owned={ownedIds.has(wish.id)}
-                  deleting={deletingId === wish.id}
-                  onDelete={handleDelete}
-                  onOpen={setOpenedWish}
-                />
+                <WishCard key={wish.id} wish={wish} onOpen={setOpenedWish} />
               ))}
             </ul>
             {wishes.length > 3 && (
-              <p className="wishes-list__hint font-body">مرّر للأسفل لرؤية المزيد</p>
+              <p className="wishes-list__hint font-body">مرّر للأسفل لرؤية كل التهاني</p>
             )}
           </>
         )}
@@ -279,16 +216,6 @@ export default function WishesSection() {
               <div className="wishes-modal__body">
                 <p className="wishes-modal__message font-verse">{openedWish.message}</p>
               </div>
-              {ownedIds.has(openedWish.id) && (
-                <button
-                  type="button"
-                  className="wishes-modal__delete font-body"
-                  onClick={() => handleDelete(openedWish.id)}
-                  disabled={deletingId === openedWish.id}
-                >
-                  {deletingId === openedWish.id ? 'جاري الحذف...' : 'حذف التهنئة'}
-                </button>
-              )}
             </motion.div>
           </motion.div>
         )}

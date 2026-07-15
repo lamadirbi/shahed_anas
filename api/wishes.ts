@@ -11,16 +11,35 @@ import {
 } from '../lib/wishes';
 import { redisConfigured, withRedis } from '../lib/redis';
 
-async function readWishes(): Promise<Wish[]> {
+/** قائمة دائمة — لا تُحذف أبداً */
+export const WISHES_ARCHIVE_KEY = 'wedding:wishes:archive';
+
+async function readList(key: string): Promise<Wish[]> {
   return withRedis(async (redis) => {
-    const raw = await redis.lRange(WISHES_KEY, 0, -1);
+    const raw = await redis.lRange(key, 0, -1);
     if (!Array.isArray(raw)) return [];
 
     return raw
       .map(parseWish)
-      .filter((wish): wish is Wish => wish !== null)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .filter((wish): wish is Wish => wish !== null);
   });
+}
+
+/** يجمع التهاني من القائمة الأساسية + الأرشيف بدون تكرار */
+async function readAllWishes(): Promise<Wish[]> {
+  const [main, archive] = await Promise.all([
+    readList(WISHES_KEY),
+    readList(WISHES_ARCHIVE_KEY),
+  ]);
+
+  const byId = new Map<string, Wish>();
+  for (const wish of [...archive, ...main]) {
+    byId.set(wish.id, wish);
+  }
+
+  return [...byId.values()].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -30,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-      const wishes = await readWishes();
+      const wishes = await readAllWishes();
       return res.status(200).json({ wishes: wishes.map(toPublicWish) });
     } catch {
       return res.status(500).json({ error: 'تعذّر جلب التهاني' });
@@ -66,8 +85,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         deleteToken: generateDeleteToken(),
       };
 
+      const payload = JSON.stringify(wish);
+
       await withRedis(async (redis) => {
-        await redis.lPush(WISHES_KEY, JSON.stringify(wish));
+        // القائمة الظاهرة + أرشيف دائم لا يُمس
+        await redis.lPush(WISHES_KEY, payload);
+        await redis.lPush(WISHES_ARCHIVE_KEY, payload);
       });
 
       return res.status(200).json({
@@ -79,52 +102,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
+  // تم تعطيل الحذف حتى لا تختفي التهاني أبداً
   if (req.method === 'DELETE') {
-    if (!redisConfigured()) {
-      return res.status(503).json({ error: 'التخزين غير مُعدّ بعد' });
-    }
-
-    try {
-      const body = (typeof req.body === 'string' ? JSON.parse(req.body) : req.body) as {
-        id?: string;
-        deleteToken?: string;
-      };
-      const id = body.id?.trim();
-      const deleteToken = body.deleteToken?.trim();
-
-      if (!id || !deleteToken) {
-        return res.status(400).json({ error: 'بيانات الحذف غير مكتملة' });
-      }
-
-      const wishes = await readWishes();
-      const target = wishes.find((wish) => wish.id === id);
-
-      if (!target) {
-        return res.status(404).json({ error: 'التّهنئة غير موجودة' });
-      }
-
-      if (target.deleteToken !== deleteToken) {
-        return res.status(403).json({ error: 'غير مسموح بحذف هذه التهنئة' });
-      }
-
-      const remaining = wishes.filter((wish) => wish.id !== id);
-
-      await withRedis(async (redis) => {
-        await redis.del(WISHES_KEY);
-        if (remaining.length > 0) {
-          await redis.lPush(
-            WISHES_KEY,
-            ...remaining.map((wish) => JSON.stringify(wish)).reverse(),
-          );
-        }
-      });
-
-      return res.status(200).json({ success: true });
-    } catch {
-      return res.status(500).json({ error: 'تعذّر حذف التهنئة' });
-    }
+    return res.status(403).json({
+      error: 'لا يمكن حذف التهاني — تبقى محفوظة دائماً',
+    });
   }
 
-  res.setHeader('Allow', 'GET, POST, DELETE');
+  res.setHeader('Allow', 'GET, POST');
   return res.status(405).json({ error: 'Method not allowed' });
 }
