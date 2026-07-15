@@ -42,6 +42,15 @@ async function readAllWishes(): Promise<Wish[]> {
   );
 }
 
+async function saveWishForever(wish: Wish): Promise<void> {
+  const payload = JSON.stringify(wish);
+  await withRedis(async (redis) => {
+    // الأرشيف أولاً (دائم) ثم القائمة الظاهرة — بدون أي DEL أبداً
+    await redis.lPush(WISHES_ARCHIVE_KEY, payload);
+    await redis.lPush(WISHES_KEY, payload);
+  });
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     if (!redisConfigured()) {
@@ -50,7 +59,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       const wishes = await readAllWishes();
-      return res.status(200).json({ wishes: wishes.map(toPublicWish) });
+      return res.status(200).json({
+        wishes: wishes.map(toPublicWish),
+        count: wishes.length,
+      });
     } catch {
       return res.status(500).json({ error: 'تعذّر جلب التهاني' });
     }
@@ -65,7 +77,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const body = (typeof req.body === 'string' ? JSON.parse(req.body) : req.body) as {
         name?: string;
         message?: string;
+        /** استرجاع دفعة تهاني مفقودة — يحتاج رمز الإدارة */
+        restore?: Array<{ name: string; message: string; createdAt?: string }>;
+        adminKey?: string;
       };
+
+      // استرجاع يدوي لدفعة تهاني (لو عندك نصوصها)
+      if (Array.isArray(body.restore)) {
+        if (!process.env.WISHES_ADMIN_KEY || body.adminKey !== process.env.WISHES_ADMIN_KEY) {
+          return res.status(403).json({ error: 'غير مصرح بالاسترجاع' });
+        }
+
+        const saved: Wish[] = [];
+        for (const item of body.restore) {
+          const name = sanitizeName(item.name ?? '');
+          const message = sanitizeMessage(item.message ?? '');
+          if (!name || !message) continue;
+
+          const wish: Wish = {
+            id: generateId(),
+            name,
+            message,
+            createdAt: item.createdAt && !Number.isNaN(Date.parse(item.createdAt))
+              ? new Date(item.createdAt).toISOString()
+              : new Date().toISOString(),
+            deleteToken: generateDeleteToken(),
+          };
+          await saveWishForever(wish);
+          saved.push(wish);
+        }
+
+        return res.status(200).json({
+          restored: saved.length,
+          wishes: saved.map(toPublicWish),
+        });
+      }
+
       const name = sanitizeName(body.name ?? '');
       const message = sanitizeMessage(body.message ?? '');
 
@@ -85,13 +132,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         deleteToken: generateDeleteToken(),
       };
 
-      const payload = JSON.stringify(wish);
-
-      await withRedis(async (redis) => {
-        // القائمة الظاهرة + أرشيف دائم لا يُمس
-        await redis.lPush(WISHES_KEY, payload);
-        await redis.lPush(WISHES_ARCHIVE_KEY, payload);
-      });
+      await saveWishForever(wish);
 
       return res.status(200).json({
         wish: toPublicWish(wish),

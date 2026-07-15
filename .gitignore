@@ -12,6 +12,7 @@ wedding-app/node_modules
 .DS_Store
 .env
 .env*.local
+wishes-backup*.json
 
 # debug
 npm-debug.log*
