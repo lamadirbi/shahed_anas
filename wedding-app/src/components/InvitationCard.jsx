@@ -88,12 +88,10 @@ export default function InvitationCard() {
             <div className="gold-line gold-line--wide" />
             <div className="couple-row">
               <div className="couple-row__side">
-                <span className="couple-row__tag font-body">المحاسب</span>
                 <p className="couple-row__name">أنس معين حنيف (كرم)</p>
               </div>
               <span className="couple-row__heart" aria-hidden="true">♥</span>
               <div className="couple-row__side">
-                <span className="couple-row__tag font-body">المهندسة</span>
                 <p className="couple-row__name">شهد محمد قشطة</p>
               </div>
             </div>
