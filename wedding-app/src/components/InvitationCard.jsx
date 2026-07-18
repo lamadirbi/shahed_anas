@@ -71,7 +71,7 @@ export default function InvitationCard() {
             <div className="gold-line" />
             <div className="parents-row">
               <div className="parents-row__side">
-                <span className="parents-row__title font-body">رجل الأعمال السيد</span>
+                <span className="parents-row__title font-body">السيد</span>
                 <p className="parents-row__name font-verse">معين حمزة حنيف</p>
               </div>
               <span className="parents-row__gem" aria-hidden="true" />
